@@ -11,6 +11,8 @@ New examples are added here as features land.
 | [`04-multi-file-merge`](./04-multi-file-merge) | Merge `.env` + `.env.local` (later wins, OS overrides files) | §4.2 |
 | [`05-json-source`](./05-json-source) | Load configuration from a `.json` file | §4.2 |
 | [`06-custom-sources`](./06-custom-sources) | Inject in-memory sources (skip `process.env`) | §4.2 |
+| [`07-grouped-unified`](./07-grouped-unified) | `createGroupedEnv` — nested groups, lazy eval, `derive()` | §4.4 |
+| [`08-grouped-distributed`](./08-grouped-distributed) | Independent `createEnv` per domain, prefix isolation | §4.4 |
 
 ## Running
 

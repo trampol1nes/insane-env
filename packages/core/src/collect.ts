@@ -26,7 +26,19 @@ export function collectEnv(options: CreateEnvOptions<unknown>): EnvMap {
     }
   }
 
+  if (options.prefix) {
+    return applyPrefix(merged, options.prefix);
+  }
   return merged;
+}
+
+function applyPrefix(map: EnvMap, prefix: string): EnvMap {
+  const out: EnvMap = {};
+  for (const [key, value] of Object.entries(map)) {
+    if (!key.startsWith(prefix)) continue;
+    out[key.slice(prefix.length)] = value;
+  }
+  return out;
 }
 
 function readAndParse(path: string): EnvMap {
