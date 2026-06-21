@@ -80,7 +80,13 @@ The project avoids the pitfalls of cumbersome integration. Instead, it leverages
 * @env-supreme/vault: Extended plugin block providing direct connection protocol to HashiCorp Vault service at startup.  
 * @env-supreme/aws: Integration block for loading secrets from AWS Parameter Store / Secrets Manager through a multi-layer caching mechanism during bootstrapping.
 
-### **4.1. Immutable Singleton Solution: Healing NestJS's Type Resolution Wound**
+### **4.2. Optional Validation via Function Hook (Optional Validation Hook)**
+
+Instead of forcing users to adopt a fixed validation suite or locking the project architecture into a Standard Schema, EnvSupreme is designed with the philosophy: Validation is optional.
+
+The library only provides a function hook (e.g., validate(envMap) \=\> ValidatedEnv) for users if they actively wish to perform data auditing. The choice of which library to use—whether Zod, Valibot, ArkType, class-validator, or even writing manual checking logic with pure JavaScript/TypeScript code—is entirely up to the developer. If the user does not provide this hook, the system will skip the validation step and only perform the variable loading task, thereby optimizing the bootstrapping speed for projects prioritizing high performance without strict type coercion.
+
+### **4.3. Immutable Singleton Solution: Healing NestJS's Type Resolution Wound**
 
 To completely fix issues \#1908 and \#2018 persisting in the @nestjs/config repository, EnvSupreme will introduce a Pre-boot Immutable Singleton Model.
 
@@ -91,12 +97,6 @@ How it works:
 3. **Crystallization Phase**: The normalized configuration is NOT written back to process.env (because process.env inherently only accepts strings) but is saved to a Memory Object, which is then frozen using Object.freeze().
 
 This static object is then provided to the application as an export, e.g., export const env \= envBuilder.build();. When integrated into the NestJS Dependency Graph, EnvService will return the original data with full static formatting, helping engineers avoid ridiculous \=== "true" comparisons and eliminating logic inference errors at the root. The registerAs race condition error also vanishes because the variable state is fully crystallized before the DI Container begins dependency injection.
-
-### **4.3. Optional Validation via Function Hook (Optional Validation Hook)**
-
-Instead of forcing users to adopt a fixed validation suite or locking the project architecture into a Standard Schema, EnvSupreme is designed with the philosophy: Validation is optional.
-
-The library only provides a function hook (e.g., validate(envMap) \=\> ValidatedEnv) for users if they actively wish to perform data auditing. The choice of which library to use—whether Zod, Valibot, ArkType, class-validator, or even writing manual checking logic with pure JavaScript/TypeScript code—is entirely up to the developer. If the user does not provide this hook, the system will skip the validation step and only perform the variable loading task, thereby optimizing the bootstrapping speed for projects prioritizing high performance without strict type coercion.
 
 ### **4.4. Namespaced Configuration Groups with Per-Group Validation (Grouped Schema Architecture)**
 
