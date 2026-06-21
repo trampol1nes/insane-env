@@ -98,74 +98,7 @@ How it works:
 
 This static object is then provided to the application as an export, e.g., export const env \= envBuilder.build();. When integrated into the NestJS Dependency Graph, EnvService will return the original data with full static formatting, helping engineers avoid ridiculous \=== "true" comparisons and eliminating logic inference errors at the root. The registerAs race condition error also vanishes because the variable state is fully crystallized before the DI Container begins dependency injection.
 
-### **4.4. Namespaced Configuration Groups with Per-Group Validation (Grouped Schema Architecture)**
-
-Enterprise applications rarely treat environment variables as a flat key-value store. A production-grade system typically manages dozens—sometimes hundreds—of configuration entries spanning database connections, authentication providers, third-party API credentials, feature flags, and observability settings. Forcing developers to define all these variables in a single monolithic schema creates maintenance nightmares and violates the Single Responsibility Principle at the configuration layer.
-
-EnvSupreme introduces a Grouped Schema Architecture that allows users to structure their environment configuration into logically separated namespaces. Each namespace operates as an independent configuration unit with its own optional validation hook (as described in section 4.2), enabling teams to apply different validation strategies per domain.
-
-**Architectural Modes:**
-
-1. **Unified Object with Nested Groups**: Users can define a single configuration object containing nested sub-objects, each representing a domain-specific configuration group. This approach is ideal for applications that prefer centralized configuration access while maintaining logical separation.
-
-```typescript
-const env = createEnv({
-  groups: {
-    database: {
-      sources: ['.env', 'config/database.yaml'],
-      validate: (raw) => dbSchema.parse(raw), // Zod for DB config
-    },
-    auth: {
-      sources: ['config/auth.json'],
-      validate: (raw) => authValidator.validate(raw), // class-validator
-    },
-    redis: {
-      sources: ['.env'],
-      // No validation - raw string access for simple cache config
-    },
-  },
-});
-
-// Access: env.database.host, env.auth.jwtSecret, env.redis.url
-```
-
-2. **Distributed Independent Objects**: For microservice architectures or modular monoliths, users can create completely separate configuration objects. Each object is independently crystallized and can be injected into different NestJS modules without cross-contamination.
-
-```typescript
-// database.config.ts
-export const dbEnv = createEnv({
-  prefix: 'DB_',
-  validate: zodDbSchema,
-});
-
-// auth.config.ts  
-export const authEnv = createEnv({
-  prefix: 'AUTH_',
-  validate: valibotAuthSchema,
-});
-
-// Each module imports only what it needs
-@Module({
-  imports: [EnvSupremeModule.forFeature(dbEnv)],
-})
-export class DatabaseModule {}
-```
-
-**Key Benefits of Grouped Architecture:**
-
-| Capability | Flat Schema (t3-env style) | Grouped Schema (EnvSupreme) |
-| :---- | :---- | :---- |
-| **Validation Granularity** | All-or-nothing validation | Per-group validation with mixed strategies |
-| **Team Ownership** | Single schema owner | Each team owns their domain's config |
-| **Partial Loading** | Must load entire schema | Load only required groups (lazy evaluation) |
-| **Testing Isolation** | Mock entire config object | Mock individual groups independently |
-| **Error Reporting** | Generic validation failure | Domain-specific error context |
-
-**Lazy Group Evaluation**: Groups are evaluated on-demand during the crystallization phase. If a NestJS module only imports the `database` group, the `auth` and `redis` groups remain unevaluated, reducing startup overhead for large applications. This lazy evaluation strategy directly addresses the cold-start latency bottleneck identified in section 3.
-
-**Cross-Group References**: For scenarios where one configuration group depends on values from another (e.g., constructing a full connection URL from host, port, and database name), EnvSupreme provides a `derive()` utility that executes after all referenced groups are crystallized, ensuring deterministic resolution order.
-
-### **4.5. Breakthrough in Enterprise Integration and Multi-Format Support (K8s, YAML, JSON)**
+### **4.4. Breakthrough in Enterprise Integration and Multi-Format Support (K8s, YAML, JSON)**
 
 Large-scale Enterprise systems rarely rely solely on traditional .env file structures. In modern infrastructure environments, businesses leverage popular orchestration and secret management platforms such as Kubernetes (K8s), AWS Secrets Manager, or HashiCorp Vault.
 
