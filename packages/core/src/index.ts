@@ -5,15 +5,10 @@ import {
   NotImplementedError,
 } from "./errors.js";
 import { deepFreeze } from "./freeze.js";
-import { derive, makeGroupedEnv } from "./group.js";
 import type {
   CreateEnvOptions,
-  CreateGroupedEnvOptions,
-  Derived,
   EnvMap,
   EnvSource,
-  GroupedEnv,
-  GroupOptions,
   ValidateHook,
 } from "./types.js";
 
@@ -43,30 +38,12 @@ export function createEnv<T>(
   return deepFreeze(result) as Readonly<T>;
 }
 
-export function createGroupedEnv<
-  G extends Record<string, GroupOptions<unknown>>,
->(options: CreateGroupedEnvOptions<G>): GroupedEnv<G> {
-  return makeGroupedEnv(options, (groupOpts) =>
-    createEnv(groupOpts as CreateEnvOptions<unknown>),
-  );
-}
-
 export {
   EnvSupremeLoadError,
   EnvSupremeValidationError,
   NotImplementedError,
   deepFreeze,
   collectEnv,
-  derive,
 };
 
-export type {
-  CreateEnvOptions,
-  CreateGroupedEnvOptions,
-  Derived,
-  EnvMap,
-  EnvSource,
-  GroupedEnv,
-  GroupOptions,
-  ValidateHook,
-};
+export type { CreateEnvOptions, EnvMap, EnvSource, ValidateHook };
