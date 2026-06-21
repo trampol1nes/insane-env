@@ -80,7 +80,7 @@ The project avoids the pitfalls of cumbersome integration. Instead, it leverages
 * @env-supreme/vault: Extended plugin block providing direct connection protocol to HashiCorp Vault service at startup.  
 * @env-supreme/aws: Integration block for loading secrets from AWS Parameter Store / Secrets Manager through a multi-layer caching mechanism during bootstrapping.
 
-### **4.2. Immutable Singleton Solution: Healing NestJS's Type Resolution Wound**
+### **4.1. Immutable Singleton Solution: Healing NestJS's Type Resolution Wound**
 
 To completely fix issues \#1908 and \#2018 persisting in the @nestjs/config repository, EnvSupreme will introduce a Pre-boot Immutable Singleton Model.
 
